@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import * as Google from 'expo-google-app-auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 // all the SignIn methods from Firebase
 import {
 	GoogleAuthProvider,
@@ -27,6 +29,11 @@ export const AuthUserProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [initialLoading, setInitialLoading] = useState(true);
 	const [loading, setLoading] = useState(false);
+	const [userFromStorage, setUserFromStorage] = useState();
+
+	const getUserFromStorages = () => {
+		AsyncStorage.getItem('user').then((userFromStorage) => setUserFromStorage(userFromStorage));
+	};
 
 	useEffect(
 		() =>
@@ -34,9 +41,14 @@ export const AuthUserProvider = ({ children }) => {
 				if (user) {
 					//Logged in user
 					setUser(user);
+					const { accessToken } = user;
+					AsyncStorage.setItem('user', accessToken);
 				} else {
 					//Not logged in user
 					setUser(null);
+					if (user === null) {
+						AsyncStorage.removeItem('user');
+					}
 				}
 
 				setInitialLoading(false);

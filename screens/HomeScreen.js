@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import userAuth from '../hooks/authUser';
 import tw from 'tailwind-rn';
@@ -38,6 +38,7 @@ const DUMMY_DATA = [
 const HomeScreen = ({ navigation }) => {
 	const { logout, user } = userAuth();
 	// console.log(user);
+	const [profiles, setProfiles] = useState([]);
 	const swipeRef = useRef(null);
 
 	useLayoutEffect(() => {
@@ -70,7 +71,7 @@ const HomeScreen = ({ navigation }) => {
 				<Swiper
 					ref={swipeRef}
 					containerStyle={{ backgroundColor: 'transparent' }}
-					cards={DUMMY_DATA}
+					cards={profiles}
 					stackSize={5}
 					cardIndex={0}
 					animateCardOpacity
@@ -114,30 +115,48 @@ const HomeScreen = ({ navigation }) => {
 							},
 						},
 					}}
-					renderCard={(card) => (
-						<View key={card.id} style={tw('bg-white h-3/4 rounded-xl')}>
-							<Image
-								style={tw('absolute top-0 h-full w-full rounded-xl')}
-								source={{ uri: card.photoURL }}
-							/>
-							<View
-								style={[
-									tw(
-										'absolute bottom-0 bg-white w-full flex-row justify-between h-20 px-6 py-2 rounded-b-xl'
-									),
-									styles.cardShadow,
-								]}
-							>
-								<View>
-									<Text style={tw('text-xl font-bold')}>
-										{card.firstName} {card.lastName}
-									</Text>
-									<Text>{card.ocupation}</Text>
+					renderCard={(card) =>
+						card ? (
+							<View key={card.id} style={tw('bg-white h-3/4 rounded-xl')}>
+								<Image
+									style={tw('absolute top-0 h-full w-full rounded-xl')}
+									source={{ uri: card.photoURL }}
+								/>
+								<View
+									style={[
+										tw(
+											'absolute bottom-0 bg-white w-full flex-row justify-between h-20 px-6 py-2 rounded-b-xl'
+										),
+										styles.cardShadow,
+									]}
+								>
+									<View>
+										<Text style={tw('text-xl font-bold')}>
+											{card.firstName} {card.lastName}
+										</Text>
+										<Text>{card.ocupation}</Text>
+									</View>
+									<Text style={tw('text-2xl font-bold')}>{card.age}</Text>
 								</View>
-								<Text style={tw('text-2xl font-bold')}>{card.age}</Text>
 							</View>
-						</View>
-					)}
+						) : (
+							<View
+								style={tw(
+									'relative bg-white h-3/4 rounded-xl justify-center items-center',
+									styles.cardShadow
+								)}
+							>
+								<Text style={tw('font-bold pb-5')}>No more profiles</Text>
+
+								<Image
+									style={tw('h-20 w-full')}
+									height={100}
+									width={100}
+									source={{ uri: 'https://links.papareact.com/6gb' }}
+								/>
+							</View>
+						)
+					}
 				/>
 			</View>
 

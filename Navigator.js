@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
@@ -11,7 +11,9 @@ const Stack = createNativeStackNavigator();
 
 const Navigator = () => {
 	const { user } = userAuth();
-
+	// console.log('este----------', user.accessToken);
+	// const { displayName } = user;
+	// console.log('name:', displayName);
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			{user ? (
