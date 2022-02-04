@@ -4,7 +4,8 @@ import userAuth from '../hooks/authUser';
 import tw from 'tailwind-rn';
 import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 import Swiper from 'react-native-deck-swiper';
-
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase/firebase';
 const DUMMY_DATA = [
 	{
 		id: 123,
@@ -41,12 +42,16 @@ const HomeScreen = ({ navigation }) => {
 	const [profiles, setProfiles] = useState([]);
 	const swipeRef = useRef(null);
 
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerShown: false,
-		});
-		20;
-	}, []);
+	useLayoutEffect(
+		() =>
+			onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
+				console.log(snapshot);
+				if (!snapshot.exists()) {
+					navigation.navigate('Modal');
+				}
+			}),
+		[]
+	);
 	return (
 		<SafeAreaView style={tw('flex-1')}>
 			{/* Header */}
@@ -65,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
 			</View>
 
 			{/* End of Header */}
-			<View style={tw('flex-1 mt-6')}>
+			<View style={tw('flex-1 mt-2')}>
 				{/* <Text>U have {DUMMY_DATA.length} personalities</Text> */}
 
 				<Swiper
