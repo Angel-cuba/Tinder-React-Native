@@ -31,9 +31,9 @@ export const AuthUserProvider = ({ children }) => {
 	const [loading, setLoading] = useState(false);
 	const [userFromStorage, setUserFromStorage] = useState();
 
-	const getUserFromStorages = () => {
-		AsyncStorage.getItem('user').then((userFromStorage) => setUserFromStorage(userFromStorage));
-	};
+	// const getUserFromStorages = () => {
+	// 	AsyncStorage.getItem('user').then((userFromStorage) => setUserFromStorage(userFromStorage));
+	// };
 
 	useEffect(
 		() =>
@@ -42,13 +42,13 @@ export const AuthUserProvider = ({ children }) => {
 					//Logged in user
 					setUser(user);
 					const { accessToken } = user;
-					AsyncStorage.setItem('user', accessToken);
+					// AsyncStorage.setItem('user', accessToken);
 				} else {
 					//Not logged in user
 					setUser(null);
-					if (user === null) {
-						AsyncStorage.removeItem('user');
-					}
+					// if (user === null) {
+					// 	AsyncStorage.removeItem('user');
+					// }
 				}
 
 				setInitialLoading(false);
