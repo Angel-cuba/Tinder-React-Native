@@ -1,10 +1,10 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import userAuth from '../hooks/authUser';
 import tw from 'tailwind-rn';
 import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 import Swiper from 'react-native-deck-swiper';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 const DUMMY_DATA = [
 	{
@@ -45,13 +45,32 @@ const HomeScreen = ({ navigation }) => {
 	useLayoutEffect(
 		() =>
 			onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
-				console.log(snapshot);
 				if (!snapshot.exists()) {
 					navigation.navigate('Modal');
 				}
 			}),
 		[]
 	);
+
+	useEffect(() => {
+		let unsubscribe;
+
+		const fetchUsers = async () => {
+			unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
+				setProfiles(
+					snapshot.docs
+						.filter((doc) => doc.id !== user.uid)
+						.map((doc) => ({
+							id: doc.id,
+							...doc.data(),
+						}))
+				);
+			});
+		};
+		fetchUsers();
+		return unsubscribe;
+	}, []);
+	console.log(profiles);
 	return (
 		<SafeAreaView style={tw('flex-1')}>
 			{/* Header */}
@@ -122,11 +141,14 @@ const HomeScreen = ({ navigation }) => {
 					}}
 					renderCard={(card) =>
 						card ? (
-							<View key={card.id} style={tw('bg-white h-3/4 rounded-xl')}>
+							<View key={card.id} style={tw('bg-white h-3/4 rounded-xl ')}>
 								<Image
-									style={tw('absolute top-0 h-full w-full rounded-xl')}
-									source={{ uri: card.photoURL }}
+									style={tw('absolute top-0 w-full h-96')} // h-full w-full rounded-sm'
+									source={{
+										uri: card.photoURL,
+									}}
 								/>
+
 								<View
 									style={[
 										tw(
@@ -136,10 +158,8 @@ const HomeScreen = ({ navigation }) => {
 									]}
 								>
 									<View>
-										<Text style={tw('text-xl font-bold')}>
-											{card.firstName} {card.lastName}
-										</Text>
-										<Text>{card.ocupation}</Text>
+										<Text style={tw('text-xl font-bold')}>{card.displayName}</Text>
+										<Text>{card.job}</Text>
 									</View>
 									<Text style={tw('text-2xl font-bold')}>{card.age}</Text>
 								</View>
